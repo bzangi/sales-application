@@ -31,7 +31,6 @@ public class Clientes {
         return cliente;
     }
 
-    @Transactional
     public Cliente atualizar(Cliente cliente){
         jdbcTemplate.update(UPDATE,
                 new Object[]{cliente.getNome(), cliente.getId()});
