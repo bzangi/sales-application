@@ -25,24 +25,27 @@ public class Config {
 
             List<Cliente> todosClientes = clientes.obterTodos();
             todosClientes.forEach(System.out::println);
-//
-//            todosClientes.forEach(c -> {
-//                c.setNome(c.getNome() + " 100% atualizado ");
-//                clientes.atualizar(c);
-//            });
-//
-//            System.out.println(clientes.buscarPorNome("Giu"));
-//
-//            todosClientes.forEach(System.out::println);
-//            clientes.obterTodos().forEach(c -> {
-//                clientes.deletar(c);
-//            });
-//            todosClientes = clientes.obterTodos();
-//            if(todosClientes.isEmpty()){
-//                System.out.println("Nenhum cliente na base de dados");
-//            } else {
-//                System.out.println(todosClientes);
-//            }
+
+            System.out.println("atualizando clientes");
+            todosClientes.forEach(c -> {
+                c.setNome(c.getNome() + " 100% atualizado ");
+                clientes.atualizar(c);
+            });
+            todosClientes.forEach(System.out::println);
+
+            System.out.println("buscando clientes");
+            System.out.println(clientes.buscarPorNome("Giu"));
+
+            System.out.println("deletando clientes");
+            clientes.obterTodos().forEach(c -> {
+                clientes.deletar(c);
+            });
+            todosClientes = clientes.obterTodos();
+            if(todosClientes.isEmpty()){
+                System.out.println("Nenhum cliente na base de dados");
+            } else {
+                System.out.println(todosClientes);
+            }
         };
     }
 
