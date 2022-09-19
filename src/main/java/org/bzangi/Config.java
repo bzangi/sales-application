@@ -20,32 +20,15 @@ public class Config {
     @Bean
     public CommandLineRunner init(@Autowired Clientes clientes){
         return args -> {
-            clientes.salvar(new Cliente("Bruno"));
-            clientes.salvar(new Cliente("Giuseppe"));
+            clientes.save(new Cliente("Bruno"));
+            clientes.save(new Cliente("Giuseppe"));
 
-            List<Cliente> todosClientes = clientes.obterTodos();
-            todosClientes.forEach(System.out::println);
-
-            System.out.println("atualizando clientes");
-            todosClientes.forEach(c -> {
-                c.setNome(c.getNome() + " 100% atualizado ");
-                clientes.atualizar(c);
-            });
+            List<Cliente> todosClientes = clientes.findAll();
             todosClientes.forEach(System.out::println);
 
             System.out.println("buscando clientes");
-            System.out.println(clientes.buscarPorNome("Giu"));
-
-            System.out.println("deletando clientes");
-            clientes.obterTodos().forEach(c -> {
-                clientes.deletar(c);
-            });
-            todosClientes = clientes.obterTodos();
-            if(todosClientes.isEmpty()){
-                System.out.println("Nenhum cliente na base de dados");
-            } else {
-                System.out.println(todosClientes);
-            }
+            List<Cliente> oi = clientes.findByNomeContaining("Giusep");
+            System.out.println(oi);
         };
     }
 
