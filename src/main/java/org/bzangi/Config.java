@@ -22,23 +22,4 @@ public class Config {
             System.out.println("-------------------RUNNING IN DEVELOPMENT ENVIRONMENT-------------------");
         };
     }
-    @Bean
-    public CommandLineRunner init(@Autowired ClientesDao clientesDao, @Autowired PedidosDao pedidosDao) {
-        return args -> {
-            Cliente cliente = new Cliente("Bruno");
-            clientesDao.save(cliente);
-
-            Pedido pedido = new Pedido();
-            pedido.setCliente(cliente);
-            pedido.setDataPedido(LocalDate.now());
-            pedido.setTotal(BigDecimal.valueOf(100));
-            pedidosDao.save(pedido);
-
-//            Cliente newCliente = clientesDao.findPedidosById(cliente.getId());
-//            System.out.println(newCliente.getPedidos());
-
-            pedidosDao.findByCliente(cliente).forEach(System.out::println);
-        };
-    }
-
 }

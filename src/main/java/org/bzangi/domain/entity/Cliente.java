@@ -1,5 +1,7 @@
 package org.bzangi.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -15,6 +17,7 @@ public class Cliente {
     private String nome;
 
 //    FetchType default é o LAZY, mas essa propriedade pode ser usada para fazer o eager loading, em casos de n+1 por exemplo
+    @JsonIgnore // propriedade deixa de existir no json
     @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
     private Set<Pedido> pedidos;
 
