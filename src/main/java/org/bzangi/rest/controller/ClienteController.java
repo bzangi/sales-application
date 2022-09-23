@@ -5,15 +5,17 @@ import org.bzangi.domain.repository.ClientesDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-@Controller
+@RestController
 @RequestMapping("/api/clientes")
 public class ClienteController {
 
@@ -21,7 +23,6 @@ public class ClienteController {
     private ClientesDao clientesDao;
 
 //    @GetMapping
-//    @ResponseBody
 //    public ResponseEntity<?> getAllClientes(){
 //        List<Cliente> clientes = clientesDao.findAll();
 //        return ResponseEntity.ok().body(clientes);
@@ -30,56 +31,54 @@ public class ClienteController {
 
 //    BUSCA AVANÇADA QUE PERMITE PASSAR FILTROS VIA QUERY PARAMS ex: /api/clientes?name=bru&cpf=22
     @GetMapping
-    public ResponseEntity<?> advancedFindCliente(Cliente filtro){
+    public List<Cliente> advancedFindCliente(Cliente filtro){
         ExampleMatcher matcher = ExampleMatcher
                 .matching()
                 .withIgnoreCase()
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         Example example = Example.of(filtro,matcher);
-        List<Cliente> clientes = clientesDao.findAll(example);
-        return ResponseEntity.ok(clientes);
+        return clientesDao.findAll(example);
     }
 
     @GetMapping("/{id}")
-    @ResponseBody
-    public ResponseEntity<?> getClienteById(@PathVariable("id") Integer id ){ // a variavel dentro de chaves esta sendo injetada pela annotation pathvariable
-        Optional<Cliente> cliente = clientesDao.findById(id);
-        try{
-            return ResponseEntity.ok().body(cliente.get());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public Cliente getClienteById(@PathVariable("id") Integer id ){ // a variavel dentro de chaves esta sendo injetada pela annotation pathvariable
+        return clientesDao
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado"));
+
     }
 
     @PostMapping
-    @ResponseBody
-    public ResponseEntity<?> saveCliente(@RequestBody Cliente cliente ){
-        Cliente clienteSalvo = clientesDao.save(cliente);
-        return ResponseEntity.ok().body(clienteSalvo);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Cliente saveCliente(@RequestBody Cliente cliente ){
+        return clientesDao.save(cliente);
     }
 
     @DeleteMapping("/{id}")
-    @ResponseBody
-    public ResponseEntity<?> deleteCliente(@PathVariable Integer id){
-        Optional<Cliente> cliente = clientesDao.findById(id);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCliente(@PathVariable Integer id){
+        clientesDao.findById(id)
+                .map( cliente -> {
+                    clientesDao.delete(cliente);
+                    return cliente;
+                })
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado"));
 
-        if (cliente.isPresent()){
-            clientesDao.delete(cliente.get());
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
-    @ResponseBody
-    public ResponseEntity updateCliente(@PathVariable Integer id,
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateCliente(@PathVariable Integer id,
                                            @RequestBody Cliente cliente){
-        return clientesDao
+        clientesDao
                 .findById(id)
                 .map( clienteExistente -> {
                     cliente.setId(clienteExistente.getId());
                     clientesDao.save(cliente);
-                    return ResponseEntity.ok().body(cliente);
-                }).orElseGet( () -> ResponseEntity.notFound().build() );
+                    return clienteExistente;
+                }).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado"));
     }
 }
