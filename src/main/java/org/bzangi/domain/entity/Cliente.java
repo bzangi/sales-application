@@ -16,6 +16,9 @@ public class Cliente {
     @Column(name = "nome", length = 100)
     private String nome;
 
+    @Column(name = "cpf", length = 11)
+    private String cpf;
+
 //    FetchType default é o LAZY, mas essa propriedade pode ser usada para fazer o eager loading, em casos de n+1 por exemplo
     @JsonIgnore // propriedade deixa de existir no json
     @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
@@ -62,5 +65,13 @@ public class Cliente {
 
     public void setPedidos(Set<Pedido> pedidos) {
         this.pedidos = pedidos;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 }

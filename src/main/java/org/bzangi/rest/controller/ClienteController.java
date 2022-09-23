@@ -3,6 +3,8 @@ package org.bzangi.rest.controller;
 import org.bzangi.domain.entity.Cliente;
 import org.bzangi.domain.repository.ClientesDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +20,24 @@ public class ClienteController {
     @Autowired
     private ClientesDao clientesDao;
 
+//    @GetMapping
+//    @ResponseBody
+//    public ResponseEntity<?> getAllClientes(){
+//        List<Cliente> clientes = clientesDao.findAll();
+//        return ResponseEntity.ok().body(clientes);
+//    }
+//    BUSCA SIMPLES
+
+//    BUSCA AVANÇADA QUE PERMITE PASSAR FILTROS VIA QUERY PARAMS ex: /api/clientes?name=bru&cpf=22
     @GetMapping
-    @ResponseBody
-    public ResponseEntity<?> getAllClientes(){
-        List<Cliente> clientes = clientesDao.findAll();
-        return ResponseEntity.ok().body(clientes);
+    public ResponseEntity<?> advancedFindCliente(Cliente filtro){
+        ExampleMatcher matcher = ExampleMatcher
+                .matching()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+        Example example = Example.of(filtro,matcher);
+        List<Cliente> clientes = clientesDao.findAll(example);
+        return ResponseEntity.ok(clientes);
     }
 
     @GetMapping("/{id}")
